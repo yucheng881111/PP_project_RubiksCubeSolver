@@ -2,20 +2,18 @@
 
 using namespace std;
 
-typedef long long ll;
-
 string Move(string state, int opt);
 
-void CW(vector<int> &v1, vector<int> &v2, vector<int> &v3){
-    int t1 = v1[0];
-    int t2 = v1[1];
-    int t3 = v1[2];
-    int t4 = v2[0];
-    int t5 = v2[1];
-    int t6 = v2[2];
-    int t7 = v3[0];
-    int t8 = v3[1];
-    int t9 = v3[2];
+void CW(vector<char> &v1, vector<char> &v2, vector<char> &v3){
+    char t1 = v1[0];
+    char t2 = v1[1];
+    char t3 = v1[2];
+    char t4 = v2[0];
+    char t5 = v2[1];
+    char t6 = v2[2];
+    char t7 = v3[0];
+    char t8 = v3[1];
+    char t9 = v3[2];
 
     v1[0] = t7; v1[1] = t4, v1[2] = t1;
     v2[0] = t8; v2[1] = t5, v2[2] = t2;
@@ -23,25 +21,25 @@ void CW(vector<int> &v1, vector<int> &v2, vector<int> &v3){
 }
 
 // FrontCW
-void rotate1(vector<vector<int>> &v){
+void rotate1(vector<vector<char>> &v){
     CW(v[6], v[7], v[8]);
 
-    int temp1[3];
+    char temp1[3];
     temp1[0] = v[2][0];
     temp1[1] = v[2][1];
     temp1[2] = v[2][2];
 
-    int temp2[3];
+    char temp2[3];
     temp2[0] = v[9][0];
     temp2[1] = v[10][0];
     temp2[2] = v[11][0];
 
-    int temp3[3];
+    char temp3[3];
     temp3[0] = v[15][0];
     temp3[1] = v[15][1];
     temp3[2] = v[15][2];
 
-    int temp4[3];
+    char temp4[3];
     temp4[0] = v[3][2];
     temp4[1] = v[4][2];
     temp4[2] = v[5][2];
@@ -64,31 +62,31 @@ void rotate1(vector<vector<int>> &v){
 
 }
 // FrontACW
-void rotate2(vector<vector<int>> &v){
+void rotate2(vector<vector<char>> &v){
     rotate1(v);
     rotate1(v);
     rotate1(v);
 }
 // UpCW
-void rotate3(vector<vector<int>> &v){
+void rotate3(vector<vector<char>> &v){
     CW(v[0], v[1], v[2]);
 
-    int temp1[3];
+    char temp1[3];
     temp1[0] = v[12][0];
     temp1[1] = v[12][1];
     temp1[2] = v[12][2];
 
-    int temp2[3];
+    char temp2[3];
     temp2[0] = v[9][0];
     temp2[1] = v[9][1];
     temp2[2] = v[9][2];
 
-    int temp3[3];
+    char temp3[3];
     temp3[0] = v[6][0];
     temp3[1] = v[6][1];
     temp3[2] = v[6][2];
 
-    int temp4[3];
+    char temp4[3];
     temp4[0] = v[3][0];
     temp4[1] = v[3][1];
     temp4[2] = v[3][2];
@@ -111,31 +109,31 @@ void rotate3(vector<vector<int>> &v){
 
 }
 // UpACW
-void rotate4(vector<vector<int>> &v){
+void rotate4(vector<vector<char>> &v){
     rotate3(v);
     rotate3(v);
     rotate3(v);
 }
 // DownCW
-void rotate5(vector<vector<int>> &v){
+void rotate5(vector<vector<char>> &v){
     CW(v[15], v[16], v[17]);
 
-    int temp1[3];
+    char temp1[3];
     temp1[0] = v[8][0];
     temp1[1] = v[8][1];
     temp1[2] = v[8][2];
 
-    int temp2[3];
+    char temp2[3];
     temp2[0] = v[11][0];
     temp2[1] = v[11][1];
     temp2[2] = v[11][2];
 
-    int temp3[3];
+    char temp3[3];
     temp3[0] = v[14][0];
     temp3[1] = v[14][1];
     temp3[2] = v[14][2];
 
-    int temp4[3];
+    char temp4[3];
     temp4[0] = v[5][0];
     temp4[1] = v[5][1];
     temp4[2] = v[5][2];
@@ -158,31 +156,31 @@ void rotate5(vector<vector<int>> &v){
 
 }
 // DownACW
-void rotate6(vector<vector<int>> &v){
+void rotate6(vector<vector<char>> &v){
     rotate5(v);
     rotate5(v);
     rotate5(v);
 }
 // LeftCW
-void rotate7(vector<vector<int>> &v){
+void rotate7(vector<vector<char>> &v){
     CW(v[3], v[4], v[5]);
 
-    int temp1[3];
+    char temp1[3];
     temp1[0] = v[0][0];
     temp1[1] = v[1][0];
     temp1[2] = v[2][0];
 
-    int temp2[3];
+    char temp2[3];
     temp2[0] = v[6][0];
     temp2[1] = v[7][0];
     temp2[2] = v[8][0];
 
-    int temp3[3];
+    char temp3[3];
     temp3[0] = v[15][0];
     temp3[1] = v[16][0];
     temp3[2] = v[17][0];
 
-    int temp4[3];
+    char temp4[3];
     temp4[0] = v[12][2];
     temp4[1] = v[13][2];
     temp4[2] = v[14][2];
@@ -205,31 +203,31 @@ void rotate7(vector<vector<int>> &v){
 
 }
 // LeftACW
-void rotate8(vector<vector<int>> &v){
+void rotate8(vector<vector<char>> &v){
     rotate7(v);
     rotate7(v);
     rotate7(v);
 }
 // RightCW
-void rotate9(vector<vector<int>> &v){
+void rotate9(vector<vector<char>> &v){
     CW(v[9], v[10], v[11]);
 
-    int temp1[3];
+    char temp1[3];
     temp1[0] = v[0][2];
     temp1[1] = v[1][2];
     temp1[2] = v[2][2];
 
-    int temp2[3];
+    char temp2[3];
     temp2[0] = v[12][0];
     temp2[1] = v[13][0];
     temp2[2] = v[14][0];
 
-    int temp3[3];
+    char temp3[3];
     temp3[0] = v[15][2];
     temp3[1] = v[16][2];
     temp3[2] = v[17][2];
 
-    int temp4[3];
+    char temp4[3];
     temp4[0] = v[6][2];
     temp4[1] = v[7][2];
     temp4[2] = v[8][2];
@@ -252,31 +250,31 @@ void rotate9(vector<vector<int>> &v){
 
 }
 // RightACW
-void rotate10(vector<vector<int>> &v){
+void rotate10(vector<vector<char>> &v){
     rotate9(v);
     rotate9(v);
     rotate9(v);
 }
 // BackCW
-void rotate11(vector<vector<int>> &v){
+void rotate11(vector<vector<char>> &v){
     CW(v[12], v[13], v[14]);
 
-    int temp1[3];
+    char temp1[3];
     temp1[0] = v[0][0];
     temp1[1] = v[0][1];
     temp1[2] = v[0][2];
 
-    int temp2[3];
+    char temp2[3];
     temp2[0] = v[3][0];
     temp2[1] = v[4][0];
     temp2[2] = v[5][0];
 
-    int temp3[3];
+    char temp3[3];
     temp3[0] = v[17][0];
     temp3[1] = v[17][1];
     temp3[2] = v[17][2];
 
-    int temp4[3];
+    char temp4[3];
     temp4[0] = v[9][2];
     temp4[1] = v[10][2];
     temp4[2] = v[11][2];
@@ -299,35 +297,34 @@ void rotate11(vector<vector<int>> &v){
 
 }
 // BackACW
-void rotate12(vector<vector<int>> &v){
+void rotate12(vector<vector<char>> &v){
     rotate11(v);
     rotate11(v);
     rotate11(v);
 }
 
-//string final_state = "111111111222222222333333333444444444555555555666666666";
 
-string to_state(vector<vector<int>> &v){
+string to_state(vector<vector<char>> &v){
     string s = "";
     for(int i=0;i<18;++i){
         for(int j=0;j<3;++j){
-            s += to_string(v[i][j]);
+            s += v[i][j];
         }
     }
     return s;
 }
 
-vector<vector<int>> to_node(string &s){
-    int tmp[3];
-    vector<vector<int>> v;
+vector<vector<char>> to_node(string &s){
+    char tmp[3];
+    vector<vector<char>> v;
     for(int i=0;i<54;++i){
         if(i % 3 == 0){
-            tmp[0] = s[i] - '0';
+            tmp[0] = s[i];
         }else if(i % 3 == 1){
-            tmp[1] = s[i] - '0';
+            tmp[1] = s[i];
         }else{
-            tmp[2] = s[i] - '0';
-            vector<int> temp(tmp,tmp+3);
+            tmp[2] = s[i];
+            vector<char> temp(tmp,tmp+3);
             v.push_back(temp);
         }
     }
@@ -352,14 +349,14 @@ string final_state = "";
 
 int manhattan_distance(string &state, int i, int z, bool corner){
 	string arr = "002102202001101201000100200002012022001011021000010020000100200010110210020120220200201202210211212220221222202102002212112012222122022020120220021121221022122222";
-	int c1_0 = arr[9*i + 3*z] - '0';
- 	int c1_1 = arr[9*i + 3*z + 1] - '0';
- 	int c1_2 = arr[9*i + 3*z + 2] - '0';
+	char c1_0 = arr[9*i + 3*z];
+ 	char c1_1 = arr[9*i + 3*z + 1];
+ 	char c1_2 = arr[9*i + 3*z + 2];
 
     int center = -1;
     int d1, d2, d3 ,d4, minimum;
-    int c2_0, c2_1, c2_2;
-    vector<vector<int>> cube = to_node(state);
+    char c2_0, c2_1, c2_2;
+    vector<vector<char>> cube = to_node(state);
     for(int c=1; c<=16; c+=3){
     	if( cube[i][z] == cube[c][1] ){
     		center = c;
@@ -369,52 +366,52 @@ int manhattan_distance(string &state, int i, int z, bool corner){
 
     if(corner){
         //c2 = array[center - 1, 0]
-        c2_0 = arr[9*(center-1) + 3*0] - '0';
- 		c2_1 = arr[9*(center-1) + 3*0 + 1] - '0';
- 		c2_2 = arr[9*(center-1) + 3*0 + 2] - '0';
+        c2_0 = arr[9*(center-1) + 3*0];
+ 		c2_1 = arr[9*(center-1) + 3*0 + 1];
+ 		c2_2 = arr[9*(center-1) + 3*0 + 2];
         d1 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         minimum = d1;
         //c2 = array[center - 1, 2]
-        c2_0 = arr[9*(center-1) + 3*2] - '0';
- 		c2_1 = arr[9*(center-1) + 3*2 + 1] - '0';
- 		c2_2 = arr[9*(center-1) + 3*2 + 2] - '0';
+        c2_0 = arr[9*(center-1) + 3*2];
+ 		c2_1 = arr[9*(center-1) + 3*2 + 1];
+ 		c2_2 = arr[9*(center-1) + 3*2 + 2];
         d2 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         if(d2<minimum){ minimum = d2; }
         //c2 = array[center + 1, 0]
-        c2_0 = arr[9*(center+1) + 3*0] - '0';
- 		c2_1 = arr[9*(center+1) + 3*0 + 1] - '0';
- 		c2_2 = arr[9*(center+1) + 3*0 + 2] - '0';
+        c2_0 = arr[9*(center+1) + 3*0];
+ 		c2_1 = arr[9*(center+1) + 3*0 + 1];
+ 		c2_2 = arr[9*(center+1) + 3*0 + 2];
         d3 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         if(d3<minimum){ minimum = d3; }
         //c2 = array[center + 1, 2]
-        c2_0 = arr[9*(center+1) + 3*2] - '0';
- 		c2_1 = arr[9*(center+1) + 3*2 + 1] - '0';
- 		c2_2 = arr[9*(center+1) + 3*2 + 2] - '0';
+        c2_0 = arr[9*(center+1) + 3*2];
+ 		c2_1 = arr[9*(center+1) + 3*2 + 1];
+ 		c2_2 = arr[9*(center+1) + 3*2 + 2];
         d4 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         if(d4<minimum){ minimum = d4; }
     }else{
         //c2 = array[center - 1, 1]
-        c2_0 = arr[9*(center-1) + 3*1] - '0';
- 		c2_1 = arr[9*(center-1) + 3*1 + 1] - '0';
- 		c2_2 = arr[9*(center-1) + 3*1 + 2] - '0';
+        c2_0 = arr[9*(center-1) + 3*1];
+ 		c2_1 = arr[9*(center-1) + 3*1 + 1];
+ 		c2_2 = arr[9*(center-1) + 3*1 + 2];
         d1 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         minimum = d1;
         //c2 = array[center, 0]
-        c2_0 = arr[9*center + 3*0] - '0';
- 		c2_1 = arr[9*center + 3*0 + 1] - '0';
- 		c2_2 = arr[9*center + 3*0 + 2] - '0';
+        c2_0 = arr[9*center + 3*0];
+ 		c2_1 = arr[9*center + 3*0 + 1];
+ 		c2_2 = arr[9*center + 3*0 + 2];
         d2 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         if(d2<minimum){ minimum = d2; }
         //c2 = array[center, 2]
-        c2_0 = arr[9*center + 3*2] - '0';
- 		c2_1 = arr[9*center + 3*2 + 1] - '0';
- 		c2_2 = arr[9*center + 3*2 + 2] - '0';
+        c2_0 = arr[9*center + 3*2];
+ 		c2_1 = arr[9*center + 3*2 + 1];
+ 		c2_2 = arr[9*center + 3*2 + 2];
         d3 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         if(d3<minimum){ minimum = d3; }
         //c2 = array[center + 1, 1]
-        c2_0 = arr[9*(center+1) + 3*1] - '0';
- 		c2_1 = arr[9*(center+1) + 3*1 + 1] - '0';
- 		c2_2 = arr[9*(center+1) + 3*1 + 2] - '0';
+        c2_0 = arr[9*(center+1) + 3*1];
+ 		c2_1 = arr[9*(center+1) + 3*1 + 1];
+ 		c2_2 = arr[9*(center+1) + 3*1 + 2];
         d4 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         if(d4<minimum){ minimum = d4; }
     }
@@ -455,9 +452,9 @@ public:
     }
 };
 
-int IDA(vector<vector<int>> &v){
+int IDA(vector<vector<char>> &v){
     used_state.clear();
-	vector<vector<int>> start_node = v;
+	vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
     queue<string> q;
     queue<int> q_g;
@@ -519,8 +516,8 @@ int IDA(vector<vector<int>> &v){
 
 }
 
-int BFS(vector<vector<int>> &v){
-    vector<vector<int>> start_node = v;
+int BFS(vector<vector<char>> &v){
+    vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
     queue<string> q;
     queue<int> q_cnt;
@@ -561,8 +558,8 @@ struct cmp{
     }
 };
 
-int A_star(vector<vector<int>> &v){
-    vector<vector<int>> start_node = v;
+int A_star(vector<vector<char>> &v){
+    vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
     priority_queue<node, vector<node>, cmp> pq;
 
@@ -599,7 +596,7 @@ int A_star(vector<vector<int>> &v){
 
 
 string Move(string state, int opt){
-    vector<vector<int>> vec = to_node(state);
+    vector<vector<char>> vec = to_node(state);
     if(opt == 1){
         rotate1(vec);
     }else if(opt == 2){
@@ -631,28 +628,28 @@ string Move(string state, int opt){
 
 int main(){
     string s;
-    vector<vector<int>> vec_input;
-    vector<vector<int>> vec1;
-    vector<vector<int>> vec2;
-    vector<vector<int>> vec3;
-    vector<vector<int>> vec4;
+    vector<vector<char>> vec_input;
+    vector<vector<char>> vec1;
+    vector<vector<char>> vec2;
+    vector<vector<char>> vec3;
+    vector<vector<char>> vec4;
     for(int i=0;i<9;++i){
         cin >> s;
         if(i>=0 && i<3){
-            int tmp[3];
-            tmp[0] = s[3] - '0';
-            tmp[1] = s[4] - '0';
-            tmp[2] = s[5] - '0';
-            vec_input.push_back(vector<int>(tmp,tmp+3));
+            char tmp[3];
+            tmp[0] = s[3];
+            tmp[1] = s[4];
+            tmp[2] = s[5];
+            vec_input.push_back(vector<char>(tmp,tmp+3));
         }else if(i>=3 && i<6){
-            int tmp1[3]; tmp1[0] = s[0] - '0'; tmp1[1] = s[1] - '0'; tmp1[2] = s[2] - '0';
-            int tmp2[3]; tmp2[0] = s[3] - '0'; tmp2[1] = s[4] - '0'; tmp2[2] = s[5] - '0';
-            int tmp3[3]; tmp3[0] = s[6] - '0'; tmp3[1] = s[7] - '0'; tmp3[2] = s[8] - '0';
-            int tmp4[3]; tmp4[0] = s[9] - '0'; tmp4[1] = s[10] - '0'; tmp4[2] = s[11] - '0';
-            vec1.push_back(vector<int>(tmp1,tmp1+3));
-            vec2.push_back(vector<int>(tmp2,tmp2+3));
-            vec3.push_back(vector<int>(tmp3,tmp3+3));
-            vec4.push_back(vector<int>(tmp4,tmp4+3));
+            char tmp1[3]; tmp1[0] = s[0]; tmp1[1] = s[1];  tmp1[2] = s[2];
+            char tmp2[3]; tmp2[0] = s[3]; tmp2[1] = s[4];  tmp2[2] = s[5];
+            char tmp3[3]; tmp3[0] = s[6]; tmp3[1] = s[7];  tmp3[2] = s[8];
+            char tmp4[3]; tmp4[0] = s[9]; tmp4[1] = s[10]; tmp4[2] = s[11];
+            vec1.push_back(vector<char>(tmp1,tmp1+3));
+            vec2.push_back(vector<char>(tmp2,tmp2+3));
+            vec3.push_back(vector<char>(tmp3,tmp3+3));
+            vec4.push_back(vector<char>(tmp4,tmp4+3));
         }else{
             if(i == 6){
                 for(const auto &v: vec1){
@@ -668,11 +665,11 @@ int main(){
                     vec_input.push_back(v);
                 }
             }
-            int tmp[3];
-            tmp[0] = s[3] - '0';
-            tmp[1] = s[4] - '0';
-            tmp[2] = s[5] - '0';
-            vec_input.push_back(vector<int>(tmp,tmp+3));
+            char tmp[3];
+            tmp[0] = s[3];
+            tmp[1] = s[4];
+            tmp[2] = s[5];
+            vec_input.push_back(vector<char>(tmp,tmp+3));
         }
     }
 
@@ -825,6 +822,17 @@ steps 6:
 000665000000
 000563000000
 000563000000
+
+steps 6:
+000122000000
+000244000000
+000336000000
+451223561416
+623511664555
+513511664522
+000233000000
+000433000000
+000446000000
 
 steps 7:
 000122000000
