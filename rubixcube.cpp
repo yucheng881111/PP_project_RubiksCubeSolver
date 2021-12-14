@@ -443,51 +443,52 @@ int corner_edge_sum_max(string &state){
 	return sum_max;
 }
 
+class node{
+public:
+    string state;
+    int f, g, h;
+    node(string s, int g_in){
+        state = s;
+        g = g_in;
+        h = corner_edge_sum_max(state);
+        f = g + h;
+    }
+};
 
 int IDA(vector<vector<int>> &v){
     used_state.clear();
 	vector<vector<int>> start_node = v;
     string start_state = to_state(start_node);
     queue<string> q;
-    queue<int> q_cnt;
     queue<int> q_g;
 
  	int minimum = -1;
  	int cost_limit = corner_edge_sum_max(start_state);
- 	//cout << cost_limit << endl;
     q.push(start_state);
-    used_state[start_state] = -1;
-    q_cnt.push(1);
     q_g.push(0);
 
     while(1){
     	minimum=-1;
     	q.push(start_state);
-    	used_state[start_state] = -1;
-    	q_cnt.push(1);
     	q_g.push(0);
 
 	    while(!q.empty()){
 	        string curr_state = q.front();
 	        string next_state = "";
-	        int cnt = q_cnt.front();
 	        int curr_g = q_g.front();
 	        q.pop();
-	        q_cnt.pop();
 	        q_g.pop();
 
+            int new_g = curr_g + 1;
 	        for(int i=1;i<=12;++i){
 	            next_state = Move(curr_state, i);
 
 	            if(goal(next_state)){
 	                used_state[next_state] = i;
 	                final_state = next_state;
-	                return cnt;
+                    return new_g;
 	            }else{
-
-	            	int new_g = curr_g + 1;
 	            	int new_h = corner_edge_sum_max(next_state);
-
 	            	if( new_g + new_h > cost_limit){
 	            		if (minimum == -1 || (new_g + new_h < minimum) ){
 	            			minimum = new_g + new_h;
@@ -500,8 +501,9 @@ int IDA(vector<vector<int>> &v){
 	            	}
 
 	                used_state[next_state] = i;
+
+                    node next_node(next_state, new_g);
 	                q.push(next_state);
-	                q_cnt.push(cnt + 1);
 	                q_g.push(new_g);
 	            }
 	        }
@@ -552,18 +554,6 @@ int BFS(vector<vector<int>> &v){
 
     return 0;
 }
-
-class node{
-public:
-    string state;
-    int f, g, h;
-    node(string s, int g_in){
-        state = s;
-        g = g_in;
-        h = corner_edge_sum_max(state);
-        f = g + h;
-    }
-};
 
 struct cmp{
     bool operator()(node &a, node &b){
@@ -707,7 +697,7 @@ int main(){
         double s = clock();
         int steps = BFS(vec_input);
         double e = clock();
-        cout << "\nsteps: " << steps << endl;
+        cout << "\nBFS steps: " << steps << endl;
         cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
@@ -716,18 +706,23 @@ int main(){
         double s = clock();
         int steps = A_star(vec_input);
         double e = clock();
-        cout << "\nsteps: " << steps << endl;
+        cout << "\nA star steps: " << steps << endl;
         cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
-    
+    /*
     {
         double s = clock();
         int steps = IDA(vec_input);
         double e = clock();
-        cout << "\nsteps: " << steps << endl;
+        cout << "\nIDA star steps: " << steps << endl;
         cout << "time: " << e - s << " ms" << endl;
     }
+    cout << endl;
+    */
+    
+    
+
     
 
     /*
