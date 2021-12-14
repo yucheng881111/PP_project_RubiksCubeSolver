@@ -445,6 +445,7 @@ int corner_edge_sum_max(string &state){
 
 
 int IDA(vector<vector<int>> &v){
+    used_state.clear();
 	vector<vector<int>> start_node = v;
     string start_state = to_state(start_node);
     queue<string> q;
@@ -523,6 +524,7 @@ int BFS(vector<vector<int>> &v){
     queue<int> q_cnt;
 
     q.push(start_state);
+    used_state.clear();
     used_state[start_state] = -1;
     q_cnt.push(1);
 
@@ -547,6 +549,61 @@ int BFS(vector<vector<int>> &v){
             }
         }
     }
+
+    return 0;
+}
+
+class node{
+public:
+    string state;
+    int f, g, h;
+    node(string s, int g_in){
+        state = s;
+        g = g_in;
+        h = corner_edge_sum_max(state);
+        f = g + h;
+    }
+};
+
+struct cmp{
+    bool operator()(node &a, node &b){
+        return a.f > b.f;
+    }
+};
+
+int A_star(vector<vector<int>> &v){
+    vector<vector<int>> start_node = v;
+    string start_state = to_state(start_node);
+    priority_queue<node, vector<node>, cmp> pq;
+
+    node node_start(start_state, 0);
+    pq.push(node_start);
+    used_state.clear();
+    used_state[start_state] = -1;
+    
+
+    while(!pq.empty()){
+        string curr_state = pq.top().state;
+        int curr_g = pq.top().g;
+        string next_state = "";
+        pq.pop();
+        int next_g = curr_g + 1;
+
+        for(int i=1;i<=12;++i){
+            next_state = Move(curr_state, i);
+
+            if(goal(next_state)){
+                used_state[next_state] = i;
+                final_state = next_state;
+                return next_g;
+            }else if(used_state.count(next_state) != 1){
+                used_state[next_state] = i;
+                node next_node(next_state, next_g);
+                pq.push(next_node);
+            }
+        }
+    }
+    return 0;
 
 }
 
@@ -631,8 +688,8 @@ int main(){
 
     
     rotate1(vec_input);
-    //rotate12(vec_input);
-    //rotate3(vec_input);
+    rotate12(vec_input);
+    rotate3(vec_input);
     //rotate9(vec_input);
     //rotate7(vec_input);
     //rotate2(vec_input);
@@ -645,10 +702,19 @@ int main(){
         cout << endl;
     }
 
-    
+    /*
     {
         double s = clock();
         int steps = BFS(vec_input);
+        double e = clock();
+        cout << "\nsteps: " << steps << endl;
+        cout << "time: " << e - s << " ms" << endl;
+    }
+    cout << endl;
+    */
+    {
+        double s = clock();
+        int steps = A_star(vec_input);
         double e = clock();
         cout << "\nsteps: " << steps << endl;
         cout << "time: " << e - s << " ms" << endl;
