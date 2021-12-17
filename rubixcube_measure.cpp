@@ -696,35 +696,6 @@ int main(){
     cout << "max time: " << *max_element(all_times.begin(), all_times.end()) << " ms" << endl;
     
 
-    /*
-    int opt;
-    string state = final_state;
-    fstream file;
-    file.open("cube_states.txt", ios::out);
-
-    while(1){
-        cout << state << endl;
-        file << state << endl;
-        opt = used_state[state];
-        if(opt == -1){
-            break;
-        }
-        if(opt % 2){
-            opt++;
-        }else{
-            opt--;
-        }
-        cout << opt << endl;
-        file << opt << endl;
-
-        state = Move(state, opt);
-    }*/
-
-
-    //cout << "\nsteps: " << steps << endl;
-
-
-    //file.close();
 	return 0;
 }
 

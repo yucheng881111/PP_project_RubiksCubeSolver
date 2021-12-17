@@ -829,7 +829,7 @@ int main(){
     }
     cout << endl;
     */
-    /*
+    
     {
         double startTime = CycleTimer::currentSeconds();
         //double s = clock();
@@ -841,7 +841,7 @@ int main(){
         //cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
-    */
+    
     
     {
         double startTime = CycleTimer::currentSeconds();

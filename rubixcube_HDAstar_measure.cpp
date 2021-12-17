@@ -1,7 +1,11 @@
 #include<bits/stdc++.h>
 #include "CycleTimer.h"
+#include<omp.h>
+#include<tbb/concurrent_queue.h>
 
 using namespace std;
+
+typedef long long ll;
 
 string Move(string state, int opt);
 
@@ -355,7 +359,6 @@ int manhattan_distance(string &state, int i, int z, bool corner){
  	char c1_2 = arr[9*i + 3*z + 2];
 
     int center = -1;
-    int d1, d2, d3 ,d4, minimum;
     char c2_0, c2_1, c2_2;
     vector<vector<char>> cube = to_node(state);
     for(int c=1; c<=16; c+=3){
@@ -364,7 +367,51 @@ int manhattan_distance(string &state, int i, int z, bool corner){
     		break;
     	}
     }
+    
+    /*int minimum=INT_MAX, d[4];
+    if(corner){
+        #pragma omp parallel for
+        for(int i =0; i<2; i++){
+            c2_0 = arr[9*(center-1) + 3*2*i];
+            c2_1 = arr[9*(center-1) + 3*2*i + 1];
+            c2_2 = arr[9*(center-1) + 3*2*i + 2];
+            d[i] = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
+        }
+        #pragma omp parallel for
+        for(int i =0; i<2; i++){
+            c2_0 = arr[9*(center+1) + 3*2*i];
+            c2_1 = arr[9*(center+1) + 3*2*i + 1];
+            c2_2 = arr[9*(center+1) + 3*2*i + 2];
+            d[i+2] = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
+        }
+        for(int i=0; i<4; i++){
+            if(d[i]<minimum) 
+                minimum = d[i];
+        }
+    }else{
+        #pragma omp parallel for
+        for(int i =0; i<2; i++){
+            c2_0 = arr[9*center + 3*2*i];
+            c2_1 = arr[9*center + 3*2*i + 1];
+            c2_2 = arr[9*center + 3*2*i + 2];
+            d[2*i] = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
+        }
+        #pragma omp parallel for
+        for(int i =-1; i<2; i+=2){
+            c2_0 = arr[9*(center+i) + 3*1];
+            c2_1 = arr[9*(center+i) + 3*1 + 1];
+            c2_2 = arr[9*(center+i) + 3*1 + 2];
+            d[i+2] = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
+        }
+        for(int i=0; i<4; i++){
+            if(d[i]<minimum) 
+                minimum = d[i];
+        }
 
+    }*/
+
+    
+    int d1, d2, d3 ,d4, minimum;
     if(corner){
         //c2 = array[center - 1, 0]
         c2_0 = arr[9*(center-1) + 3*0];
@@ -423,14 +470,43 @@ int manhattan_distance(string &state, int i, int z, bool corner){
 int corner_edge_sum_max(string &state){
 	int corners = 0;
 	int edges = 0;
-	for(int i=0; i<18; i++){
+
+    /*
+    //Another method
+    int corners_mat[18];
+    int edges_mat[18];
+    #pragma omp parallel for
+    for(int i=0; i<18; i+=3){
+        corners_mat[i] = manhattan_distance(state, i, 0, true) + manhattan_distance(state, i, 2, true);
+        corners_mat[i+1] = 0;
+        corners_mat[i+2] = manhattan_distance(state, i+2, 0, true) + manhattan_distance(state, i+2, 2, true);
+        edges_mat[i] = manhattan_distance(state, i, 1, false);
+        edges_mat[i+1] = manhattan_distance(state, i+1, 0, false) + manhattan_distance(state, i+1, 2, false);
+        edges_mat[i+2] = manhattan_distance(state, i+2, 1, false);        
+    }
+    #pragma omp parallel for reduction(+:corners, edges)
+    for(int i=0; i<18; i++){
+        corners = corners + corners_mat[i];
+        edges = edges + edges_mat[i];
+    }*/
+
+    #pragma omp parallel for reduction(+:corners, edges)
+    for(int i=0; i<18; i+=3){
+        corners = corners + manhattan_distance(state, i, 0, true) + manhattan_distance(state, i, 2, true);
+        corners = corners + manhattan_distance(state, i+2, 0, true) + manhattan_distance(state, i+2, 2, true);
+        edges = edges + manhattan_distance(state, i, 1, false);
+        edges = edges + manhattan_distance(state, i+1, 0, false) + manhattan_distance(state, i+1, 2, false);
+        edges = edges + manhattan_distance(state, i+2, 1, false);        
+    }
+    
+	/*for(int i=0; i<18; i++){
 		if(i % 3 == 0 || i % 3 == 2){
 			corners = corners + manhattan_distance(state, i, 0, true) + manhattan_distance(state, i, 2, true);
             edges = edges + manhattan_distance(state, i, 1, false);
 		}else{
 			edges = edges + manhattan_distance(state, i, 0, false) + manhattan_distance(state, i, 2, false);
 		}
-	}
+	}*/
 
 	int sum_max;
 	if( (corners/12) >= (edges/8) ){
@@ -445,6 +521,7 @@ class node{
 public:
     string state;
     int f, g, h;
+    node(){}
     node(string s, int g_in){
         state = s;
         g = g_in;
@@ -454,67 +531,87 @@ public:
 };
 
 int IDA(vector<vector<char>> &v){
-    used_state.clear();
-	vector<vector<char>> start_node = v;
+    vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
-    queue<string> q;
-    queue<int> q_g;
+    node node_start(start_state, 0);
+    int thread_num = 12;
+    bool finished = 0;
+    bool end[thread_num];
+    int ans = 0;
+    int minimum[thread_num];
 
- 	int minimum = -1;
- 	int cost_limit = corner_edge_sum_max(start_state);
-    q.push(start_state);
-    q_g.push(0);
+    omp_set_num_threads(thread_num);
+    tbb::concurrent_queue<node> global_q[thread_num];
+    hash<string> H;
 
-    while(1){
-    	minimum=-1;
-    	q.push(start_state);
-    	q_g.push(0);
+    global_q[H(start_state) % thread_num].push(node_start);
 
-	    while(!q.empty()){
-	        string curr_state = q.front();
-	        string next_state = "";
-	        int curr_g = q_g.front();
-	        q.pop();
-	        q_g.pop();
+    int cost_limit = node_start.h;
 
-            int new_g = curr_g + 1;
-	        for(int i=1;i<=12;++i){
-	            next_state = Move(curr_state, i);
+    while(!finished){
+        for(int i=0; i<thread_num; i++){
+            minimum[i] = INT_MAX;
+            end[i]=false;
+        }
 
-	            if(goal(next_state)){
-	                used_state[next_state] = i;
-	                final_state = next_state;
-                    return new_g;
-	            }else{
-	            	int new_h = corner_edge_sum_max(next_state);
-	            	if( new_g + new_h > cost_limit){
-	            		if (minimum == -1 || (new_g + new_h < minimum) ){
-	            			minimum = new_g + new_h;
-	            		}
-	            		continue;
-	            	}
+        global_q[H(start_state) % thread_num].push(node_start);
 
-	            	if(used_state.count(next_state) == 1){
-	            		continue;
-	            	}
+        #pragma omp parallel
+        {
+            int id = omp_get_thread_num();
+            queue<node> q;
+            unordered_set<ll> used;
+            hash<string> H1;
+            while( !finished && (!end[0] || !end[1] || !end[2] || !end[3] || !end[4] || !end[5] || !end[6] || !end[7] || !end[8] || !end[9] || !end[10] || !end[11]) ){
+                while(!global_q[id].empty()){
+                    node n;
+                    global_q[id].try_pop(n);
+                    q.push(n);
+                    end[id] = false;
+                }
 
-	                used_state[next_state] = i;
+                if(q.empty()){
+                    end[id] = true;
+                    continue;
+                }
 
-                    node next_node(next_state, new_g);
-	                q.push(next_state);
-	                q_g.push(new_g);
-	            }
-	        }
+                node curr_node = q.front();
+                q.pop();
+                string curr_state = curr_node.state;
 
-	    }
+                if(used.count(H1(curr_state))){
+                    continue;
+                }
 
-	    used_state.clear();
-	    cost_limit = minimum;
-	}
+                int curr_g = curr_node.g;
+                int next_g = curr_g + 1;
+                used.insert(H1(curr_state));
 
-    return 0;
+                for(int i=1;i<=12;++i){
+                    string next_state = Move(curr_state, i);
+                    if(goal(next_state)){
+                        ans = next_g;
+                        finished = 1;
+                        break;
+                    }else{
+                        node next_node(next_state, next_g);
+                        if( next_node.g + next_node.h > cost_limit){
+                            if ( next_node.g + next_node.h < minimum[id] ){
+                                minimum[id] = next_node.g + next_node.h;
+                            }
+                            continue;
+                        }
 
+                        used.insert(H1(next_state));
+                        global_q[H1(next_state) % thread_num].push(next_node);
+                    }
+                }
+            }
+        }
+        cost_limit = *min_element(minimum , minimum + thread_num);
+    }
 
+    return ans;
 }
 
 int BFS(vector<vector<char>> &v){
@@ -559,40 +656,67 @@ struct cmp{
     }
 };
 
+
 int A_star(vector<vector<char>> &v){
     vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
-    priority_queue<node, vector<node>, cmp> pq;
-
     node node_start(start_state, 0);
-    pq.push(node_start);
-    used_state.clear();
-    used_state[start_state] = -1;
-    
+    int thread_num = 12;
+    bool finished = 0;
+    int ans = 0;
 
-    while(!pq.empty()){
-        string curr_state = pq.top().state;
-        int curr_g = pq.top().g;
-        string next_state = "";
-        pq.pop();
-        int next_g = curr_g + 1;
+    omp_set_num_threads(thread_num);
+    tbb::concurrent_queue<node> global_q[thread_num];
+    hash<string> H;
+    global_q[H(start_state) % thread_num].push(node_start);
 
-        for(int i=1;i<=12;++i){
-            next_state = Move(curr_state, i);
+    #pragma omp parallel
+    {
+        int id = omp_get_thread_num();
+        priority_queue<node, vector<node>, cmp> pq;
+        unordered_set<ll> used;
+        hash<string> H1;
 
-            if(goal(next_state)){
-                used_state[next_state] = i;
-                final_state = next_state;
-                return next_g;
-            }else if(used_state.count(next_state) != 1){
-                used_state[next_state] = i;
-                node next_node(next_state, next_g);
-                pq.push(next_node);
+        while(!finished){
+            while(!global_q[id].empty()){
+                node n; 
+                global_q[id].try_pop(n);
+                pq.push(n);
+            }
+
+            if(pq.empty()){
+                continue;
+            }
+
+            node curr_node = pq.top();
+            pq.pop();
+            string curr_state = curr_node.state;
+
+            if(used.count(H1(curr_state))){
+                continue;
+            }
+
+            int curr_g = curr_node.g;
+            int next_g = curr_g + 1;
+            used.insert(H1(curr_state));
+
+            for(int i=1;i<=12;++i){
+                string next_state = Move(curr_state, i);
+                if(goal(next_state)){
+                    //used.insert(H1(next_state));
+                    ans = next_g;
+                    finished = 1;
+                    break;
+                }else if(used.count(H1(next_state)) != 1){
+                    used.insert(H1(next_state));
+                    node next_node(next_state, next_g);
+                    global_q[H1(next_state) % thread_num].push(next_node);
+                }
             }
         }
     }
-    return 0;
 
+    return ans;
 }
 
 
@@ -628,226 +752,74 @@ string Move(string state, int opt){
 }
 
 int main(){
-    string s;
-    vector<vector<char>> vec_input;
-    vector<vector<char>> vec1;
-    vector<vector<char>> vec2;
-    vector<vector<char>> vec3;
-    vector<vector<char>> vec4;
-    for(int i=0;i<9;++i){
-        cin >> s;
-        if(i>=0 && i<3){
-            char tmp[3];
-            tmp[0] = s[3];
-            tmp[1] = s[4];
-            tmp[2] = s[5];
-            vec_input.push_back(vector<char>(tmp,tmp+3));
-        }else if(i>=3 && i<6){
-            char tmp1[3]; tmp1[0] = s[0]; tmp1[1] = s[1];  tmp1[2] = s[2];
-            char tmp2[3]; tmp2[0] = s[3]; tmp2[1] = s[4];  tmp2[2] = s[5];
-            char tmp3[3]; tmp3[0] = s[6]; tmp3[1] = s[7];  tmp3[2] = s[8];
-            char tmp4[3]; tmp4[0] = s[9]; tmp4[1] = s[10]; tmp4[2] = s[11];
-            vec1.push_back(vector<char>(tmp1,tmp1+3));
-            vec2.push_back(vector<char>(tmp2,tmp2+3));
-            vec3.push_back(vector<char>(tmp3,tmp3+3));
-            vec4.push_back(vector<char>(tmp4,tmp4+3));
-        }else{
-            if(i == 6){
-                for(const auto &v: vec1){
-                    vec_input.push_back(v);
-                }
-                for(const auto &v: vec2){
-                    vec_input.push_back(v);
-                }
-                for(const auto &v: vec3){
-                    vec_input.push_back(v);
-                }
-                for(const auto &v: vec4){
-                    vec_input.push_back(v);
-                }
+    
+    int test = 5;
+    int input_steps = 6;
+    int method = 2; // 1:BFS 2:A_star 3:IDA
+    double avg = 0.0;
+    srand((unsigned)time(NULL));
+    vector<double> all_times;
+
+    for(int times=1;times<=test;){
+        string sstart = "111111111222222222333333333444444444555555555666666666";
+        
+        for(int i=0;i<input_steps;++i){
+            int move_opt = rand() % 12 + 1;
+            sstart = Move(sstart, move_opt);
+        }
+        
+        vector<vector<char>> vec_input = to_node(sstart);
+        
+
+        
+        if(method == 1){
+            double startTime = CycleTimer::currentSeconds();
+            int steps = BFS(vec_input);
+            if(steps != input_steps){
+                continue;
             }
-            char tmp[3];
-            tmp[0] = s[3];
-            tmp[1] = s[4];
-            tmp[2] = s[5];
-            vec_input.push_back(vector<char>(tmp,tmp+3));
+            double endTime = CycleTimer::currentSeconds();
+            cout << times << " times:" << endl;
+            times++;
+            cout << "\nBFS steps: " << steps << endl;
+            printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
+            avg += ((endTime - startTime) * 1000);
+            all_times.push_back((endTime - startTime) * 1000);
+            cout << endl;
+        }else if(method == 2){
+            double startTime = CycleTimer::currentSeconds();
+            int steps = A_star(vec_input);
+            if(steps != input_steps){
+                continue;
+            }
+            double endTime = CycleTimer::currentSeconds();
+            cout << times << " times:" << endl;
+            times++;
+            cout << "\nA star steps: " << steps << endl;
+            printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
+            avg += ((endTime - startTime) * 1000);
+            all_times.push_back((endTime - startTime) * 1000);
+            cout << endl;
+        }else if(method == 3){
+            double startTime = CycleTimer::currentSeconds();
+            int steps = IDA(vec_input);
+            if(steps != input_steps){
+                continue;
+            }
+            double endTime = CycleTimer::currentSeconds();
+            cout << times << " times:" << endl;
+            times++;
+            cout << "\nIDA star steps: " << steps << endl;
+            printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
+            avg += ((endTime - startTime) * 1000);
+            all_times.push_back((endTime - startTime) * 1000);
+            cout << endl;
         }
     }
-
-
-    for(int i=0;i<18;++i){
-        for(int j=0;j<3;++j){
-            cout << vec_input[i][j] << " ";
-        }
-        cout << endl;
-    }
-
-    /*
-    {
-        double startTime = CycleTimer::currentSeconds();
-        int steps = BFS(vec_input);
-        double endTime = CycleTimer::currentSeconds();        
-        cout << "\nA star steps: " << steps << endl;
-        printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
-    }
-    cout << endl;
-    */
-    {
-        double startTime = CycleTimer::currentSeconds();
-        //double s = clock();
-        int steps = A_star(vec_input);
-        //double e = clock();
-        double endTime = CycleTimer::currentSeconds();        
-        cout << "\nA star steps: " << steps << endl;
-        printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
-        //cout << "time: " << e - s << " ms" << endl;
-    }
-    cout << endl;
-    /*
-    {
-        double startTime = CycleTimer::currentSeconds();
-        int steps = IDA(vec_input);
-        double endTime = CycleTimer::currentSeconds();        
-        cout << "\nA star steps: " << steps << endl;
-        printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
-    }
-    cout << endl;
-    */
-    
+    cout << endl << "avg time: " << avg / test  << " ms" << endl;
+    cout << "min time: " << *min_element(all_times.begin(), all_times.end()) << " ms" << endl;
+    cout << "max time: " << *max_element(all_times.begin(), all_times.end()) << " ms" << endl;
     
 
-    
-
-    /*
-    int opt;
-    string state = final_state;
-    fstream file;
-    file.open("cube_states.txt", ios::out);
-
-    while(1){
-        cout << state << endl;
-        file << state << endl;
-        opt = used_state[state];
-        if(opt == -1){
-            break;
-        }
-        if(opt % 2){
-            opt++;
-        }else{
-            opt--;
-        }
-        cout << opt << endl;
-        file << opt << endl;
-
-        state = Move(state, opt);
-    }*/
-
-
-    //cout << "\nsteps: " << steps << endl;
-
-
-    //file.close();
-	return 0;
+    return 0;
 }
-
-/*
-initial:
-000111000000
-000111000000
-000111000000
-222333444555
-222333444555
-222333444555
-000666000000
-000666000000
-000666000000
-
-steps 2:
-000315000000
-000315000000
-000315000000
-222631444651
-222631444651
-222631444651
-000563000000
-000563000000
-000563000000
-
-steps 1:
-000511000000
-000511000000
-000511000000
-222133444556
-222133444556
-222133444556
-000366000000
-000366000000
-000366000000
-
-steps 5:
-000515000000
-000515000000
-000322000000
-224111544636
-224133644656
-113233644654
-000122000000
-000563000000
-000563000000
-
-steps 8:
-000351000000 
-000412000000
-000452000000
-211345664521
-622331241355
-312331245666
-000665000000
-000563000000
-000444000000
-
-steps 6:
-000515000000 
-000515000000
-000344000000
-221211344636
-222331244656
-112331244654
-000665000000
-000563000000
-000563000000
-
-steps 6:
-000122000000
-000244000000
-000336000000
-451223561416
-623511664555
-513511664522
-000233000000
-000433000000
-000446000000
-
-steps 7:
-000122000000
-000515000000
-000344000000
-521211345664
-622331241355
-312331245666
-000665000000
-000563000000
-000444000000
-
-steps 10:
-000655000000
-000511000000
-000151000000
-362345226224
-121433446255
-221434514166
-000366000000
-000363000000
-000345000000
-
-*/
