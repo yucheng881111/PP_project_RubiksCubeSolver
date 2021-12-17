@@ -687,7 +687,7 @@ int A_star(vector<vector<char>> &v){
                     ans = next_g;
                     finished = 1;
                     break;
-                }else{
+                }else if(used.count(H1(next_state)) != 1){
                     used.insert(H1(next_state));
                     node next_node(next_state, next_g);
                     global_q[H1(next_state) % thread_num].push(next_node);
