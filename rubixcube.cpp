@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include "CycleTimer.h"
 
 using namespace std;
 
@@ -673,14 +674,6 @@ int main(){
         }
     }
 
-    
-    //rotate1(vec_input);
-    //rotate12(vec_input);
-    //rotate3(vec_input);
-    //rotate9(vec_input);
-    //rotate7(vec_input);
-    //rotate2(vec_input);
-    //rotate4(vec_input);
 
     for(int i=0;i<18;++i){
         for(int j=0;j<3;++j){
@@ -699,17 +692,18 @@ int main(){
     }
     cout << endl;
     */
-    /*
     {
-        double s = clock();
+        double startTime = CycleTimer::currentSeconds();
+        //double s = clock();
         int steps = A_star(vec_input);
-        double e = clock();
+        //double e = clock();
+        double endTime = CycleTimer::currentSeconds();        
         cout << "\nA star steps: " << steps << endl;
-        cout << "time: " << e - s << " ms" << endl;
+        printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
+        //cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
-    */
-    
+    /*
     {
         double s = clock();
         int steps = IDA(vec_input);
@@ -718,7 +712,7 @@ int main(){
         cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
-    
+    */
     
     
 
@@ -844,4 +838,16 @@ steps 7:
 000665000000
 000563000000
 000444000000
+
+steps 10:
+000655000000
+000511000000
+000151000000
+362345226224
+121433446255
+221434514166
+000366000000
+000363000000
+000345000000
+
 */
