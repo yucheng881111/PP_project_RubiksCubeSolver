@@ -368,7 +368,7 @@ int manhattan_distance(string &state, int i, int z, bool corner){
     	}
     }
     
-    int minimum=INT_MAX, d[4];
+    /*int minimum=INT_MAX, d[4];
     if(corner){
         #pragma omp parallel for
         for(int i =0; i<2; i++){
@@ -408,10 +408,10 @@ int manhattan_distance(string &state, int i, int z, bool corner){
                 minimum = d[i];
         }
 
-    }
+    }*/
 
     
-    /*int d1, d2, d3 ,d4, minimum;
+    int d1, d2, d3 ,d4, minimum;
     if(corner){
         //c2 = array[center - 1, 0]
         c2_0 = arr[9*(center-1) + 3*0];
@@ -462,7 +462,7 @@ int manhattan_distance(string &state, int i, int z, bool corner){
  		c2_2 = arr[9*(center+1) + 3*1 + 2];
         d4 = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
         if(d4<minimum){ minimum = d4; }
-    }*/
+    }
 
     return minimum;
 }
