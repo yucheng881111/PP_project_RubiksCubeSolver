@@ -531,67 +531,87 @@ public:
 };
 
 int IDA(vector<vector<char>> &v){
-    used_state.clear();
-	vector<vector<char>> start_node = v;
+    vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
-    queue<string> q;
-    queue<int> q_g;
+    node node_start(start_state, 0);
+    int thread_num = 12;
+    bool finished = 0;
+    bool end[thread_num];
+    int ans = 0;
+    int minimum[thread_num];
 
- 	int minimum = -1;
- 	int cost_limit = corner_edge_sum_max(start_state);
-    q.push(start_state);
-    q_g.push(0);
+    omp_set_num_threads(thread_num);
+    tbb::concurrent_queue<node> global_q[thread_num];
+    hash<string> H;
 
-    while(1){
-    	minimum=-1;
-    	q.push(start_state);
-    	q_g.push(0);
+    global_q[H(start_state) % thread_num].push(node_start);
 
-	    while(!q.empty()){
-	        string curr_state = q.front();
-	        string next_state = "";
-	        int curr_g = q_g.front();
-	        q.pop();
-	        q_g.pop();
+    int cost_limit = node_start.h;
 
-            int new_g = curr_g + 1;
-	        for(int i=1;i<=12;++i){
-	            next_state = Move(curr_state, i);
+    while(!finished){
+        for(int i=0; i<thread_num; i++){
+            minimum[i] = INT_MAX;
+            end[i]=false;
+        }
 
-	            if(goal(next_state)){
-	                used_state[next_state] = i;
-	                final_state = next_state;
-                    return new_g;
-	            }else{
-	            	int new_h = corner_edge_sum_max(next_state);
-	            	if( new_g + new_h > cost_limit){
-	            		if (minimum == -1 || (new_g + new_h < minimum) ){
-	            			minimum = new_g + new_h;
-	            		}
-	            		continue;
-	            	}
+        global_q[H(start_state) % thread_num].push(node_start);
 
-	            	if(used_state.count(next_state) == 1){
-	            		continue;
-	            	}
+        #pragma omp parallel
+        {
+            int id = omp_get_thread_num();
+            queue<node> q;
+            unordered_set<ll> used;
+            hash<string> H1;
+            while( !finished && (!end[0] || !end[1] || !end[2] || !end[3] || !end[4] || !end[5] || !end[6] || !end[7] || !end[8] || !end[9] || !end[10] || !end[11]) ){
+                while(!global_q[id].empty()){
+                    node n;
+                    global_q[id].try_pop(n);
+                    q.push(n);
+                    end[id] = false;
+                }
 
-	                used_state[next_state] = i;
+                if(q.empty()){
+                    end[id] = true;
+                    continue;
+                }
 
-                    node next_node(next_state, new_g);
-	                q.push(next_state);
-	                q_g.push(new_g);
-	            }
-	        }
+                node curr_node = q.front();
+                q.pop();
+                string curr_state = curr_node.state;
 
-	    }
+                if(used.count(H1(curr_state))){
+                    continue;
+                }
 
-	    used_state.clear();
-	    cost_limit = minimum;
-	}
+                int curr_g = curr_node.g;
+                int next_g = curr_g + 1;
+                used.insert(H1(curr_state));
 
-    return 0;
+                for(int i=1;i<=12;++i){
+                    string next_state = Move(curr_state, i);
+                    if(goal(next_state)){
+                        ans = next_g;
+                        finished = 1;
+                        break;
+                    }else{
+                        node next_node(next_state, next_g);
+                        if( next_node.g + next_node.h > cost_limit){
+                            if ( next_node.g + next_node.h < minimum[id] ){
+                                minimum[id] = next_node.g + next_node.h;
+                            }
+                            continue;
+                        }
 
+                        used.insert(H1(next_state));
+                        global_q[H1(next_state) % thread_num].push(next_node);
+                    }
+                }
+            }
+        }
+        cost_limit = *min_element(minimum , minimum + thread_num);
+    }
 
+    return ans;
 }
 
 int BFS(vector<vector<char>> &v){
@@ -809,7 +829,7 @@ int main(){
     }
     cout << endl;
     */
-
+    /*
     {
         double startTime = CycleTimer::currentSeconds();
         //double s = clock();
@@ -821,8 +841,8 @@ int main(){
         //cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
+    */
     
-    /*
     {
         double startTime = CycleTimer::currentSeconds();
         //double s = clock();
@@ -834,7 +854,7 @@ int main(){
         //cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
-    */
+    
     
     
 
@@ -872,92 +892,3 @@ int main(){
 	return 0;
 }
 
-/*
-initial:
-000111000000
-000111000000
-000111000000
-222333444555
-222333444555
-222333444555
-000666000000
-000666000000
-000666000000
-
-steps 2:
-000315000000
-000315000000
-000315000000
-222631444651
-222631444651
-222631444651
-000563000000
-000563000000
-000563000000
-
-steps 1:
-000511000000
-000511000000
-000511000000
-222133444556
-222133444556
-222133444556
-000366000000
-000366000000
-000366000000
-
-steps 5:
-000515000000
-000515000000
-000322000000
-224111544636
-224133644656
-113233644654
-000122000000
-000563000000
-000563000000
-
-steps 8:
-000351000000 
-000412000000
-000452000000
-211345664521
-622331241355
-312331245666
-000665000000
-000563000000
-000444000000
-
-steps 6:
-000515000000 
-000515000000
-000344000000
-221211344636
-222331244656
-112331244654
-000665000000
-000563000000
-000563000000
-
-steps 6:
-000122000000
-000244000000
-000336000000
-451223561416
-623511664555
-513511664522
-000233000000
-000433000000
-000446000000
-
-steps 7:
-000122000000
-000515000000
-000344000000
-521211345664
-622331241355
-312331245666
-000665000000
-000563000000
-000444000000
-*/
