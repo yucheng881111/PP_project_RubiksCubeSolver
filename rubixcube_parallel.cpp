@@ -772,7 +772,7 @@ int main(){
     }
 
     
-    //rotate1(vec_input);
+    
     //rotate12(vec_input);
     //rotate3(vec_input);
     //rotate9(vec_input);

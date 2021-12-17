@@ -602,7 +602,6 @@ int IDA(vector<vector<char>> &v){
                             continue;
                         }
 
-                        used.insert(H1(next_state));
                         global_q[H1(next_state) % thread_num].push(next_node);
                     }
                 }
@@ -703,12 +702,10 @@ int A_star(vector<vector<char>> &v){
             for(int i=1;i<=12;++i){
                 string next_state = Move(curr_state, i);
                 if(goal(next_state)){
-                    //used.insert(H1(next_state));
                     ans = next_g;
                     finished = 1;
                     break;
                 }else if(used.count(H1(next_state)) != 1){
-                    used.insert(H1(next_state));
                     node next_node(next_state, next_g);
                     global_q[H1(next_state) % thread_num].push(next_node);
                 }
@@ -753,9 +750,9 @@ string Move(string state, int opt){
 
 int main(){
     
-    int test = 5;
-    int input_steps = 6;
-    int method = 2; // 1:BFS 2:A_star 3:IDA
+    int test = 10;
+    int input_steps = 7;
+    int method = 3; // 1:BFS 2:A_star 3:IDA
     double avg = 0.0;
     srand((unsigned)time(NULL));
     vector<double> all_times;
@@ -769,13 +766,12 @@ int main(){
         }
         
         vector<vector<char>> vec_input = to_node(sstart);
-        
 
-        
         if(method == 1){
             double startTime = CycleTimer::currentSeconds();
             int steps = BFS(vec_input);
             if(steps != input_steps){
+		cout << "steps " << steps << " not match." <<endl;
                 continue;
             }
             double endTime = CycleTimer::currentSeconds();
@@ -790,6 +786,7 @@ int main(){
             double startTime = CycleTimer::currentSeconds();
             int steps = A_star(vec_input);
             if(steps != input_steps){
+		cout << "steps " << steps << " not match." << endl;
                 continue;
             }
             double endTime = CycleTimer::currentSeconds();
@@ -804,6 +801,7 @@ int main(){
             double startTime = CycleTimer::currentSeconds();
             int steps = IDA(vec_input);
             if(steps != input_steps){
+		cout << "steps " << steps << " not match." << endl;
                 continue;
             }
             double endTime = CycleTimer::currentSeconds();

@@ -367,48 +367,6 @@ int manhattan_distance(string &state, int i, int z, bool corner){
     		break;
     	}
     }
-    
-    /*int minimum=INT_MAX, d[4];
-    if(corner){
-        #pragma omp parallel for
-        for(int i =0; i<2; i++){
-            c2_0 = arr[9*(center-1) + 3*2*i];
-            c2_1 = arr[9*(center-1) + 3*2*i + 1];
-            c2_2 = arr[9*(center-1) + 3*2*i + 2];
-            d[i] = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
-        }
-        #pragma omp parallel for
-        for(int i =0; i<2; i++){
-            c2_0 = arr[9*(center+1) + 3*2*i];
-            c2_1 = arr[9*(center+1) + 3*2*i + 1];
-            c2_2 = arr[9*(center+1) + 3*2*i + 2];
-            d[i+2] = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
-        }
-        for(int i=0; i<4; i++){
-            if(d[i]<minimum) 
-                minimum = d[i];
-        }
-    }else{
-        #pragma omp parallel for
-        for(int i =0; i<2; i++){
-            c2_0 = arr[9*center + 3*2*i];
-            c2_1 = arr[9*center + 3*2*i + 1];
-            c2_2 = arr[9*center + 3*2*i + 2];
-            d[2*i] = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
-        }
-        #pragma omp parallel for
-        for(int i =-1; i<2; i+=2){
-            c2_0 = arr[9*(center+i) + 3*1];
-            c2_1 = arr[9*(center+i) + 3*1 + 1];
-            c2_2 = arr[9*(center+i) + 3*1 + 2];
-            d[i+2] = abs(c1_0 - c2_0) + abs(c1_1 - c2_1) + abs(c1_2 - c2_2);
-        }
-        for(int i=0; i<4; i++){
-            if(d[i]<minimum) 
-                minimum = d[i];
-        }
-
-    }*/
 
     
     int d1, d2, d3 ,d4, minimum;
@@ -490,6 +448,7 @@ int corner_edge_sum_max(string &state){
         edges = edges + edges_mat[i];
     }*/
 
+    
     #pragma omp parallel for reduction(+:corners, edges)
     for(int i=0; i<18; i+=3){
         corners = corners + manhattan_distance(state, i, 0, true) + manhattan_distance(state, i, 2, true);
@@ -498,15 +457,16 @@ int corner_edge_sum_max(string &state){
         edges = edges + manhattan_distance(state, i+1, 0, false) + manhattan_distance(state, i+1, 2, false);
         edges = edges + manhattan_distance(state, i+2, 1, false);        
     }
-    
-	/*for(int i=0; i<18; i++){
+    /*
+	for(int i=0; i<18; i++){
 		if(i % 3 == 0 || i % 3 == 2){
 			corners = corners + manhattan_distance(state, i, 0, true) + manhattan_distance(state, i, 2, true);
             edges = edges + manhattan_distance(state, i, 1, false);
 		}else{
 			edges = edges + manhattan_distance(state, i, 0, false) + manhattan_distance(state, i, 2, false);
 		}
-	}*/
+	}
+	*/
 
 	int sum_max;
 	if( (corners/12) >= (edges/8) ){
@@ -602,7 +562,7 @@ int IDA(vector<vector<char>> &v){
                             continue;
                         }
 
-                        used.insert(H1(next_state));
+                        //used.insert(H1(next_state));
                         global_q[H1(next_state) % thread_num].push(next_node);
                     }
                 }
@@ -662,7 +622,7 @@ int A_star(vector<vector<char>> &v){
     string start_state = to_state(start_node);
     node node_start(start_state, 0);
     int thread_num = 12;
-    bool finished = 0;
+    volatile bool finished = 0;
     int ans = 0;
 
     omp_set_num_threads(thread_num);
@@ -708,7 +668,6 @@ int A_star(vector<vector<char>> &v){
                     finished = 1;
                     break;
                 }else if(used.count(H1(next_state)) != 1){
-                    used.insert(H1(next_state));
                     node next_node(next_state, next_g);
                     global_q[H1(next_state) % thread_num].push(next_node);
                 }
@@ -854,10 +813,6 @@ int main(){
         //cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
-    
-    
-    
-
     
 
     /*
