@@ -682,7 +682,7 @@ int main(){
         cout << endl;
     }
 
-    
+    /*
     {
         double startTime = CycleTimer::currentSeconds();
         int steps = BFS(vec_input);
@@ -691,7 +691,7 @@ int main(){
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
     }
     cout << endl;
-
+    */
     {
         double startTime = CycleTimer::currentSeconds();
         //double s = clock();
@@ -718,7 +718,7 @@ int main(){
 
     
 
-    /*
+    
     int opt;
     string state = final_state;
     fstream file;
@@ -740,14 +740,11 @@ int main(){
         file << opt << endl;
 
         state = Move(state, opt);
-    }*/
+    }
 
 
-    //cout << "\nsteps: " << steps << endl;
-
-
-    //file.close();
-	return 0;
+    file.close();
+    return 0;
 }
 
 /*

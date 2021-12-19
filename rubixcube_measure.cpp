@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include "CycleTimer.h"
 
 using namespace std;
 
@@ -558,6 +559,7 @@ struct cmp{
     }
 };
 
+int nodes = 0;
 int A_star(vector<vector<char>> &v){
     vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
@@ -565,6 +567,7 @@ int A_star(vector<vector<char>> &v){
 
     node node_start(start_state, 0);
     pq.push(node_start);
+    nodes++;
     used_state.clear();
     used_state[start_state] = -1;
     
@@ -582,11 +585,13 @@ int A_star(vector<vector<char>> &v){
             if(goal(next_state)){
                 used_state[next_state] = i;
                 final_state = next_state;
+		nodes++;
                 return next_g;
             }else if(used_state.count(next_state) != 1){
                 used_state[next_state] = i;
                 node next_node(next_state, next_g);
                 pq.push(next_node);
+		nodes++;
             }
         }
     }
@@ -628,15 +633,17 @@ string Move(string state, int opt){
 
 int main(){
     
-    int test = 5;
-    int input_steps = 10;
+    int test = 10;
+    int input_steps = 7;
     int method = 2; // 1:BFS 2:A_star 3:IDA
     double avg = 0.0;
     srand((unsigned)time(NULL));
     vector<double> all_times;
+    vector<int> num_nodes;
 
     for(int times=1;times<=test;){
         string sstart = "111111111222222222333333333444444444555555555666666666";
+	nodes = 0;
         
         for(int i=0;i<input_steps;++i){
             int move_opt = rand() % 12 + 1;
@@ -662,16 +669,18 @@ int main(){
             all_times.push_back(e - s);
             cout << endl;
         }else if(method == 2){
-            double s = clock();
+            double s = CycleTimer::currentSeconds();
             int steps = A_star(vec_input);
             if(steps != input_steps){
                 continue;
             }
-            double e = clock();
+            double e = CycleTimer::currentSeconds();
             cout << times << " times:" << endl;
             times++;
             cout << "\nA star steps: " << steps << endl;
-            cout << "time: " << e - s << " ms" << endl;
+            cout << "time: " << (e - s) * 1000 << " ms" << endl;
+	    cout << "nodes: " << nodes << endl;
+	    num_nodes.push_back(nodes);
             avg += (e - s);
             all_times.push_back(e - s);
             cout << endl;
@@ -694,6 +703,9 @@ int main(){
     cout << endl << "avg time: " << avg / test  << " ms" << endl;
     cout << "min time: " << *min_element(all_times.begin(), all_times.end()) << " ms" << endl;
     cout << "max time: " << *max_element(all_times.begin(), all_times.end()) << " ms" << endl;
+
+    cout << "min nodes: " << *min_element(num_nodes.begin(), num_nodes.end()) << endl;
+    cout << "max nodes: " << *max_element(num_nodes.begin(), num_nodes.end()) << endl;
     
 
 	return 0;
