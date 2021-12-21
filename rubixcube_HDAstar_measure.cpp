@@ -616,37 +616,62 @@ int IDA(vector<vector<char>> &v){
 int BFS(vector<vector<char>> &v){
     vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
-    queue<string> q;
-    queue<int> q_cnt;
 
-    q.push(start_state);
-    used_state.clear();
-    used_state[start_state] = -1;
-    q_cnt.push(1);
+    int thread_num = 12;
+    bool finished = false;
+    int ans;
 
-    while(!q.empty()){
-        string curr_state = q.front();
-        string next_state = "";
-        int cnt = q_cnt.front();
-        q.pop();
-        q_cnt.pop();
+    omp_set_num_threads(thread_num);
+    tbb::concurrent_queue<pair<string, int>> global_q[thread_num];
 
-        for(int i=1;i<=12;++i){
-            next_state = Move(curr_state, i);
+    hash<string> H;
+    global_q[H(start_state) % thread_num].push(make_pair(start_state, 1));
 
-            if(goal(next_state)){
-                used_state[next_state] = i;
-                final_state = next_state;
-                return cnt;
-            }else if(used_state.count(next_state) != 1){
-                used_state[next_state] = i;
-                q.push(next_state);
-                q_cnt.push(cnt + 1);
+    #pragma omp parallel
+    {   
+        int id = omp_get_thread_num();
+        queue<pair<string, int>> tq;
+        unordered_set<ll> used;
+        hash<string> H1;
+
+        while(!finished){
+            while(!global_q[id].empty()){
+                pair<string, int> bfs_node;
+                global_q[id].try_pop(bfs_node);
+                tq.push(bfs_node);
+            }
+
+            if(tq.empty()){
+                continue;
+            }
+            
+            pair<string, int> bfs_node = tq.front();
+            tq.pop();
+            string curr_state = bfs_node.first;
+            int cnt = bfs_node.second;
+
+            if(used.count(H1(curr_state))){
+                continue;
+            }
+
+            used.insert(H1(curr_state));
+
+            for(int i=1;i<=12;++i){
+                string next_state = Move(curr_state, i);
+                if(goal(next_state)){
+                    final_state = next_state;
+                    ans = cnt;
+                    finished = true;
+                    break;
+                }else if(used.count(H1(next_state)) != 1){
+                    global_q[H1(next_state) % thread_num].push(make_pair(next_state, cnt + 1));
+                }
             }
         }
     }
 
-    return 0;
+
+    return ans;
 }
 
 struct cmp{
