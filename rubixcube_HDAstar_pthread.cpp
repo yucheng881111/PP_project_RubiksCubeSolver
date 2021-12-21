@@ -424,9 +424,39 @@ int manhattan_distance(string &state, int i, int z, bool corner){
     return minimum;
 }
 
+/*-------------------------*/
+// For parallel heuristic
+/*-------------------------*/
+/*struct cal{
+	int id;
+	int corners_mat;
+	int edges_mat;
+	string manhattan_state;
+};
+void *heuristic_fn(void *const args){
+    cal *mycal=(cal *)args;
+    int id = mycal->id;
+    string manhattan_state = mycal->manhattan_state;
+    int i = 3*id;
+    mycal->corners_mat += manhattan_distance(manhattan_state, i, 0, true) + manhattan_distance(manhattan_state, i, 2, true);
+    mycal->corners_mat += manhattan_distance(manhattan_state, i+2, 0, true) + manhattan_distance(manhattan_state, i+2, 2, true);
+    mycal->edges_mat += manhattan_distance(manhattan_state, i, 1, false);
+    mycal->edges_mat += manhattan_distance(manhattan_state, i+1, 0, false) + manhattan_distance(manhattan_state, i+1, 2, false);
+    mycal->edges_mat += manhattan_distance(manhattan_state, i+2, 1, false);	
+   return args; 
+
+}*/
+/*-------------------------*/
+// For parallel heuristic
+/*-------------------------*/
+
 int corner_edge_sum_max(string &state){
 	int corners = 0;
 	int edges = 0;
+
+	/*-------------------------*/
+	// For serial heuristic
+	/*-------------------------*/
 	for(int i=0; i<18; i++){
 		if(i % 3 == 0 || i % 3 == 2){
 			corners = corners + manhattan_distance(state, i, 0, true) + manhattan_distance(state, i, 2, true);
@@ -435,6 +465,32 @@ int corner_edge_sum_max(string &state){
 			edges = edges + manhattan_distance(state, i, 0, false) + manhattan_distance(state, i, 2, false);
 		}
 	}
+	/*-------------------------*/
+	// For serial heuristic
+	/*-------------------------*/
+	
+
+	/*-------------------------*/
+	// For parallel heuristcic
+	/*-------------------------*/
+	/*vector<pthread_t> threads(6);
+	cal mycal[6];
+    	for(int i = 0; i < 6; i++){
+		mycal[i].id = i;
+		mycal[i].corners_mat = 0;
+		mycal[i].edges_mat = 0;
+		mycal[i].manhattan_state = state;
+		pthread_create(&threads[i], NULL, heuristic_fn, (void *)&mycal[i]);
+    	}
+
+    	for (int i = 0; i < 6; i++) {
+        	pthread_join(threads[i], NULL);
+		corners += mycal[i].corners_mat;
+		edges += mycal[i].edges_mat;
+    	}*/
+	/*-------------------------*/
+	// For parallel heuristic
+	/*-------------------------*/
 
 	int sum_max;
 	if( (corners/12) >= (edges/8) ){
@@ -458,69 +514,6 @@ public:
     }
 };
 
-/*int IDA(vector<vector<char>> &v){
-    used_state.clear();
-	vector<vector<char>> start_node = v;
-    string start_state = to_state(start_node);
-    queue<string> q;
-    queue<int> q_g;
-
- 	int minimum = -1;
- 	int cost_limit = corner_edge_sum_max(start_state);
-    q.push(start_state);
-    q_g.push(0);
-
-    while(1){
-    	minimum=-1;
-    	q.push(start_state);
-    	q_g.push(0);
-
-	    while(!q.empty()){
-	        string curr_state = q.front();
-	        string next_state = "";
-	        int curr_g = q_g.front();
-	        q.pop();
-	        q_g.pop();
-
-            int new_g = curr_g + 1;
-	        for(int i=1;i<=12;++i){
-	            next_state = Move(curr_state, i);
-
-	            if(goal(next_state)){
-	                used_state[next_state] = i;
-	                final_state = next_state;
-                    return new_g;
-	            }else{
-	            	int new_h = corner_edge_sum_max(next_state);
-	            	if( new_g + new_h > cost_limit){
-	            		if (minimum == -1 || (new_g + new_h < minimum) ){
-	            			minimum = new_g + new_h;
-	            		}
-	            		continue;
-	            	}
-
-	            	if(used_state.count(next_state) == 1){
-	            		continue;
-	            	}
-
-	                used_state[next_state] = i;
-
-                    node next_node(next_state, new_g);
-	                q.push(next_state);
-	                q_g.push(new_g);
-	            }
-	        }
-
-	    }
-
-	    used_state.clear();
-	    cost_limit = minimum;
-	}
-
-    return 0;
-
-
-}*/
 
 /*-------------------------*/
 // For IDA
@@ -886,7 +879,7 @@ int main(){
         double startTime = CycleTimer::currentSeconds();
         int steps = BFS(vec_input);
         double endTime = CycleTimer::currentSeconds();        
-        cout << "\nPthread BFS: " << steps << endl;
+        cout << "\nPthread BFS steps: " << steps << endl;
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
     }
     cout << endl;
