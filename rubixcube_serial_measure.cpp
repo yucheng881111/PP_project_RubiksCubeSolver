@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include "CycleTimer.h"
 
 using namespace std;
 
@@ -558,6 +559,7 @@ struct cmp{
     }
 };
 
+//int nodes = 0;
 int A_star(vector<vector<char>> &v){
     vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
@@ -565,6 +567,7 @@ int A_star(vector<vector<char>> &v){
 
     node node_start(start_state, 0);
     pq.push(node_start);
+    //nodes++;
     used_state.clear();
     used_state[start_state] = -1;
     
@@ -582,11 +585,13 @@ int A_star(vector<vector<char>> &v){
             if(goal(next_state)){
                 used_state[next_state] = i;
                 final_state = next_state;
+		        //nodes++;
                 return next_g;
             }else if(used_state.count(next_state) != 1){
                 used_state[next_state] = i;
                 node next_node(next_state, next_g);
                 pq.push(next_node);
+		        //nodes++;
             }
         }
     }
@@ -628,15 +633,17 @@ string Move(string state, int opt){
 
 int main(){
     
-    int test = 5;
-    int input_steps = 10;
+    int test = 10;
+    int input_steps = 7;
     int method = 2; // 1:BFS 2:A_star 3:IDA
     double avg = 0.0;
     srand((unsigned)time(NULL));
     vector<double> all_times;
+    //vector<int> num_nodes;
 
     for(int times=1;times<=test;){
         string sstart = "111111111222222222333333333444444444555555555666666666";
+	    //nodes = 0;
         
         for(int i=0;i<input_steps;++i){
             int move_opt = rand() % 12 + 1;
@@ -645,49 +652,50 @@ int main(){
         
         vector<vector<char>> vec_input = to_node(sstart);
         
-
-        
         if(method == 1){
-            double s = clock();
+            double startTime = CycleTimer::currentSeconds();
             int steps = BFS(vec_input);
             if(steps != input_steps){
+                cout << "steps " << steps << " not match." <<endl;
                 continue;
             }
-            double e = clock();
+            double endTime = CycleTimer::currentSeconds();
             cout << times << " times:" << endl;
             times++;
             cout << "\nBFS steps: " << steps << endl;
-            cout << "time: " << e - s << " ms" << endl;
-            avg += (e - s);
-            all_times.push_back(e - s);
+            printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
+            avg += ((endTime - startTime) * 1000);
+            all_times.push_back((endTime - startTime) * 1000);
             cout << endl;
         }else if(method == 2){
-            double s = clock();
+            double startTime = CycleTimer::currentSeconds();
             int steps = A_star(vec_input);
             if(steps != input_steps){
+                cout << "steps " << steps << " not match." << endl;
                 continue;
             }
-            double e = clock();
+            double endTime = CycleTimer::currentSeconds();
             cout << times << " times:" << endl;
             times++;
             cout << "\nA star steps: " << steps << endl;
-            cout << "time: " << e - s << " ms" << endl;
-            avg += (e - s);
-            all_times.push_back(e - s);
+            printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
+            avg += ((endTime - startTime) * 1000);
+            all_times.push_back((endTime - startTime) * 1000);
             cout << endl;
         }else if(method == 3){
-            double s = clock();
+            double startTime = CycleTimer::currentSeconds();
             int steps = IDA(vec_input);
             if(steps != input_steps){
+                cout << "steps " << steps << " not match." << endl;
                 continue;
             }
-            double e = clock();
+            double endTime = CycleTimer::currentSeconds();
             cout << times << " times:" << endl;
             times++;
             cout << "\nIDA star steps: " << steps << endl;
-            cout << "time: " << e - s << " ms" << endl;
-            avg += (e - s);
-            all_times.push_back(e - s);
+            printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
+            avg += ((endTime - startTime) * 1000);
+            all_times.push_back((endTime - startTime) * 1000);
             cout << endl;
         }
     }

@@ -457,16 +457,16 @@ int corner_edge_sum_max(string &state){
         edges = edges + manhattan_distance(state, i+1, 0, false) + manhattan_distance(state, i+1, 2, false);
         edges = edges + manhattan_distance(state, i+2, 1, false);        
     }
-    /*
-	for(int i=0; i<18; i++){
-		if(i % 3 == 0 || i % 3 == 2){
-			corners = corners + manhattan_distance(state, i, 0, true) + manhattan_distance(state, i, 2, true);
-            edges = edges + manhattan_distance(state, i, 1, false);
-		}else{
-			edges = edges + manhattan_distance(state, i, 0, false) + manhattan_distance(state, i, 2, false);
-		}
-	}
-	*/
+    
+	/*for(int i=0; i<18; i++){
+	    if(i % 3 == 0 || i % 3 == 2){
+		corners = corners + manhattan_distance(state, i, 0, true) + manhattan_distance(state, i, 2, true);
+            	edges = edges + manhattan_distance(state, i, 1, false);
+	    }else{
+		edges = edges + manhattan_distance(state, i, 0, false) + manhattan_distance(state, i, 2, false);
+	    }
+	}*/
+	
 
 	int sum_max;
 	if( (corners/12) >= (edges/8) ){
