@@ -504,7 +504,7 @@ int IDA(vector<vector<char>> &v){
     tbb::concurrent_queue<node> global_q[thread_num];
     hash<string> H;
 
-    global_q[H(start_state) % thread_num].push(node_start);
+    //global_q[H(start_state) % thread_num].push(node_start);
 
     int cost_limit = node_start.h;
 
@@ -553,7 +553,7 @@ int IDA(vector<vector<char>> &v){
                         ans = next_g;
                         finished = 1;
                         break;
-                    }else{
+                    }else if(used.count(H1(next_state)) != 1){
                         node next_node(next_state, next_g);
                         if( next_node.g + next_node.h > cost_limit){
                             if ( next_node.g + next_node.h < minimum[id] ){
@@ -800,7 +800,7 @@ int main(){
 
 
 
-    
+    /*
     {
         double startTime = CycleTimer::currentSeconds();
         int steps = BFS(vec_input);
@@ -809,7 +809,7 @@ int main(){
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
     }
     cout << endl;
-    
+    */
     
     {
         double startTime = CycleTimer::currentSeconds();

@@ -533,10 +533,10 @@ int IDA(vector<vector<char>> &v){
     queue<string> q;
     queue<int> q_g;
 
- 	int minimum = -1;
- 	int cost_limit = corner_edge_sum_max(start_state);
-    q.push(start_state);
-    q_g.push(0);
+    int minimum;
+    int cost_limit = corner_edge_sum_max(start_state);
+    //q.push(start_state);
+    //q_g.push(0);
 
     while(1){
     	minimum=-1;

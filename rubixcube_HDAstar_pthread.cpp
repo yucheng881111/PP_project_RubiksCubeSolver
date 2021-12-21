@@ -449,6 +449,7 @@ class node{
 public:
     string state;
     int f, g, h;
+    node(){}
     node(string s, int g_in){
         state = s;
         g = g_in;
@@ -457,7 +458,7 @@ public:
     }
 };
 
-int IDA(vector<vector<char>> &v){
+/*int IDA(vector<vector<char>> &v){
     used_state.clear();
 	vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
@@ -519,7 +520,112 @@ int IDA(vector<vector<char>> &v){
     return 0;
 
 
+}*/
+
+/*-------------------------*/
+// For IDA
+/*-------------------------*/
+
+const int ida_thread_num = 12;
+bool ida_finished = false;
+int ida_ans;
+tbb::concurrent_queue<node> ida_global_q[ida_thread_num];
+hash<string> ida_H;
+int ida_cost_limit;
+bool ida_end[ida_thread_num];
+int ida_minimum[ida_thread_num];
+
+void *IDA_thrd_fn(void *const args){
+    int id = *(int *)args;
+    queue<node> q;
+    unordered_set<ll> used;
+    hash<string> H1;
+
+    while(!ida_finished && (!ida_end[0] || !ida_end[1] || !ida_end[2] || !ida_end[3] || !ida_end[4] || !ida_end[5] || !ida_end[6] || !ida_end[7] || !ida_end[8] || !ida_end[9] || !ida_end[10] || !ida_end[11])){
+        while(!ida_global_q[id].empty()){
+            node n;
+            ida_global_q[id].try_pop(n);
+            q.push(n);
+            ida_end[id] = false;
+        }
+
+        if(q.empty()){
+            ida_end[id] = true;
+            continue;
+        }
+
+        node curr_node = q.front();
+        q.pop();
+        string curr_state = curr_node.state;
+
+        if(used.count(H1(curr_state))){
+            continue;
+        }
+
+        int curr_g = curr_node.g;
+        int next_g = curr_g + 1;
+        used.insert(H1(curr_state));
+
+        for(int i=1;i<=12;++i){
+            string next_state = Move(curr_state, i);
+            if(goal(next_state)){
+                ida_ans = next_g;
+                ida_finished = true;
+                break;
+            }else if(used.count(H1(next_state)) != 1){
+		node next_node(next_state, next_g);
+                if( next_node.g + next_node.h > ida_cost_limit){
+                    if ( next_node.g + next_node.h < ida_minimum[id] ){
+                        ida_minimum[id] = next_node.g + next_node.h;
+                    }
+                    continue;
+                }
+
+                ida_global_q[H1(next_state) % ida_thread_num].push(next_node);
+            }
+        }
+    }
+
+    return args;
 }
+
+
+int IDA(vector<vector<char>> &v){
+    vector<vector<char>> start_node = v;
+    string start_state = to_state(start_node);
+    node node_start(start_state, 0);
+    ida_cost_limit = node_start.h;
+
+    while(!ida_finished){
+        for(int i=0; i<ida_thread_num; i++){
+            ida_minimum[i] = INT_MAX;
+            ida_end[i] = false;
+        }
+
+        ida_global_q[ida_H(start_state) % ida_thread_num].push(node_start);
+
+        vector<pthread_t> threads(ida_thread_num);
+        int thr_id[ida_thread_num];
+        for(int i = 0; i < ida_thread_num; i++){
+            thr_id[i] = i;
+            pthread_create(&threads[i], NULL, IDA_thrd_fn, (void *)&thr_id[i]);
+        }
+
+        for (int i = 0; i < ida_thread_num; i++) {
+            pthread_join(threads[i], NULL);
+        }
+        ida_cost_limit = *min_element(ida_minimum , ida_minimum + ida_thread_num);
+    }
+
+
+    return ida_ans;
+}
+
+
+
+/*-------------------------*/
+// For IDA
+/*-------------------------*/
 
 /*-------------------------*/
 // For BFS
@@ -606,41 +712,87 @@ struct cmp{
     }
 };
 
-int A_star(vector<vector<char>> &v){
-    vector<vector<char>> start_node = v;
-    string start_state = to_state(start_node);
+/*-------------------------*/
+// For A_star
+/*-------------------------*/
+
+const int astar_thread_num = 12;
+bool astar_finished = false;
+int astar_ans;
+tbb::concurrent_queue<node> astar_global_q[astar_thread_num];
+hash<string> astar_H;
+
+void *ASTAR_thrd_fn(void *const args){
+    int id = *(int *)args;
     priority_queue<node, vector<node>, cmp> pq;
+    unordered_set<ll> used;
+    hash<string> H1;
 
-    node node_start(start_state, 0);
-    pq.push(node_start);
-    used_state.clear();
-    used_state[start_state] = -1;
-    
+    while(!astar_finished){
+        while(!astar_global_q[id].empty()){
+            node n;
+            astar_global_q[id].try_pop(n);
+            pq.push(n);
+        }
 
-    while(!pq.empty()){
-        string curr_state = pq.top().state;
-        int curr_g = pq.top().g;
-        string next_state = "";
+        if(pq.empty()){
+            continue;
+        }
+
+        node curr_node = pq.top();
         pq.pop();
+        string curr_state = curr_node.state;
+
+        if(used.count(H1(curr_state))){
+            continue;
+        }
+
+        int curr_g = curr_node.g;
         int next_g = curr_g + 1;
+        used.insert(H1(curr_state));
 
         for(int i=1;i<=12;++i){
-            next_state = Move(curr_state, i);
-
+            string next_state = Move(curr_state, i);
             if(goal(next_state)){
-                used_state[next_state] = i;
-                final_state = next_state;
-                return next_g;
-            }else if(used_state.count(next_state) != 1){
-                used_state[next_state] = i;
+                astar_ans = next_g;
+                astar_finished = true;
+                break;
+            }else if(used.count(H1(next_state)) != 1){
                 node next_node(next_state, next_g);
-                pq.push(next_node);
+                astar_global_q[H1(next_state) % astar_thread_num].push(next_node);
             }
         }
     }
-    return 0;
 
+    return args;
 }
+
+int A_star(vector<vector<char>> &v){
+    vector<vector<char>> start_node = v;
+    string start_state = to_state(start_node);
+    node node_start(start_state, 0);
+
+    astar_global_q[astar_H(start_state) % astar_thread_num].push(node_start);
+
+    vector<pthread_t> threads(astar_thread_num);
+    int thr_id[astar_thread_num];
+    for(int i = 0; i < astar_thread_num; i++){
+        thr_id[i] = i;
+        pthread_create(&threads[i], NULL, ASTAR_thrd_fn, (void *)&thr_id[i]);
+    }
+
+    for (int i = 0; i < astar_thread_num; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    return astar_ans;
+}
+
+
+
+/*-------------------------*/
+// For A_star
+/*-------------------------*/
 
 
 string Move(string state, int opt){
@@ -730,7 +882,7 @@ int main(){
     }
 
     
-    {
+    /*{
         double startTime = CycleTimer::currentSeconds();
         int steps = BFS(vec_input);
         double endTime = CycleTimer::currentSeconds();        
@@ -738,29 +890,27 @@ int main(){
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
     }
     cout << endl;
+    */
     /*
     {
         double startTime = CycleTimer::currentSeconds();
-        //double s = clock();
         int steps = A_star(vec_input);
-        //double e = clock();
         double endTime = CycleTimer::currentSeconds();        
-        cout << "\nA star steps: " << steps << endl;
+        cout << "\nPthread A star steps: " << steps << endl;
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
-        //cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
     */
-    /*
+    
     {
         double startTime = CycleTimer::currentSeconds();
         int steps = IDA(vec_input);
         double endTime = CycleTimer::currentSeconds();        
-        cout << "\nA star steps: " << steps << endl;
+        cout << "\nPthread IDA steps: " << steps << endl;
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
     }
     cout << endl;
-    */
+    
     
     
 

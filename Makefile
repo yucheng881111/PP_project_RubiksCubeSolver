@@ -8,7 +8,7 @@ hdastar:
 hdastarm:
 	g++ rubixcube_HDAstar_measure.cpp -o rubixcube_HDAstar_measure -fopenmp -ltbb
 hdapt:
-	g++ rubixcube_HDAstar_pthread.cpp -o rubixcube_HDAstar_pthread -fopenmp -ltbb
+	g++ rubixcube_HDAstar_pthread.cpp -o rubixcube_HDAstar_pthread -lpthread -ltbb
 para:
 	g++ rubixcube_parallel.cpp -o rubixcube_parallel -fopenmp
 

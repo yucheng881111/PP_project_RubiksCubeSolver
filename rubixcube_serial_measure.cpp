@@ -460,10 +460,10 @@ int IDA(vector<vector<char>> &v){
     queue<string> q;
     queue<int> q_g;
 
- 	int minimum = -1;
- 	int cost_limit = corner_edge_sum_max(start_state);
-    q.push(start_state);
-    q_g.push(0);
+    int minimum;
+    int cost_limit = corner_edge_sum_max(start_state);
+    //q.push(start_state);
+    //q_g.push(0);
 
     while(1){
     	minimum=-1;
@@ -516,7 +516,7 @@ int IDA(vector<vector<char>> &v){
 
 
 }
-
+int nodes;
 int BFS(vector<vector<char>> &v){
     vector<vector<char>> start_node = v;
     string start_state = to_state(start_node);
@@ -527,6 +527,7 @@ int BFS(vector<vector<char>> &v){
     used_state.clear();
     used_state[start_state] = -1;
     q_cnt.push(1);
+    //nodes++;
 
     while(!q.empty()){
         string curr_state = q.front();
@@ -541,11 +542,13 @@ int BFS(vector<vector<char>> &v){
             if(goal(next_state)){
                 used_state[next_state] = i;
                 final_state = next_state;
+		//nodes++;
                 return cnt;
             }else if(used_state.count(next_state) != 1){
                 used_state[next_state] = i;
                 q.push(next_state);
                 q_cnt.push(cnt + 1);
+		//nodes++;
             }
         }
     }
@@ -634,8 +637,8 @@ string Move(string state, int opt){
 int main(){
     
     int test = 10;
-    int input_steps = 7;
-    int method = 2; // 1:BFS 2:A_star 3:IDA
+    int input_steps = 8;
+    int method = 3; // 1:BFS 2:A_star 3:IDA
     double avg = 0.0;
     srand((unsigned)time(NULL));
     vector<double> all_times;
@@ -643,7 +646,7 @@ int main(){
 
     for(int times=1;times<=test;){
         string sstart = "111111111222222222333333333444444444555555555666666666";
-	    //nodes = 0;
+	//nodes = 0;
         
         for(int i=0;i<input_steps;++i){
             int move_opt = rand() % 12 + 1;
@@ -663,6 +666,8 @@ int main(){
             cout << times << " times:" << endl;
             times++;
             cout << "\nBFS steps: " << steps << endl;
+	    //cout << "nodes: " << nodes << endl;
+	    //num_nodes.push_back(nodes);
             printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
             avg += ((endTime - startTime) * 1000);
             all_times.push_back((endTime - startTime) * 1000);
@@ -703,6 +708,8 @@ int main(){
     cout << "min time: " << *min_element(all_times.begin(), all_times.end()) << " ms" << endl;
     cout << "max time: " << *max_element(all_times.begin(), all_times.end()) << " ms" << endl;
     
+    //cout << "min nodes: " << *min_element(num_nodes.begin(), num_nodes.end()) << endl;
+    //cout << "max nodes: " << *max_element(num_nodes.begin(), num_nodes.end()) << endl;
 
 	return 0;
 }

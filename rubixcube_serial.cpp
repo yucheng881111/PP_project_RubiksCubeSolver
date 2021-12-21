@@ -460,10 +460,10 @@ int IDA(vector<vector<char>> &v){
     queue<string> q;
     queue<int> q_g;
 
- 	int minimum = -1;
- 	int cost_limit = corner_edge_sum_max(start_state);
-    q.push(start_state);
-    q_g.push(0);
+    int minimum;
+    int cost_limit = corner_edge_sum_max(start_state);
+    //q.push(start_state);
+    //q_g.push(0);
 
     while(1){
     	minimum=-1;
@@ -682,16 +682,16 @@ int main(){
         cout << endl;
     }
 
-    /*
+    
     {
         double startTime = CycleTimer::currentSeconds();
         int steps = BFS(vec_input);
         double endTime = CycleTimer::currentSeconds();        
-        cout << "\nA star steps: " << steps << endl;
+        cout << "\nBFS steps: " << steps << endl;
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
     }
     cout << endl;
-    */
+    
     {
         double startTime = CycleTimer::currentSeconds();
         //double s = clock();
@@ -703,22 +703,22 @@ int main(){
         //cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
-    /*
+    
     {
         double startTime = CycleTimer::currentSeconds();
         int steps = IDA(vec_input);
         double endTime = CycleTimer::currentSeconds();        
-        cout << "\nA star steps: " << steps << endl;
+        cout << "\nIDA steps: " << steps << endl;
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
     }
     cout << endl;
-    */
     
     
-
     
 
     
+
+    /*
     int opt;
     string state = final_state;
     fstream file;
@@ -744,6 +744,7 @@ int main(){
 
 
     file.close();
+    */
     return 0;
 }
 
