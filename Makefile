@@ -1,4 +1,4 @@
-all: serial serialm hdastar hdastarm hdapt para
+all: serial serialm hdastar hdastarm hdapt hdaptm para
 serial: 
 	g++ rubixcube_serial.cpp -o rubixcube_serial
 serialm:
@@ -9,6 +9,8 @@ hdastarm:
 	g++ rubixcube_HDAstar_measure.cpp -o rubixcube_HDAstar_measure -fopenmp -ltbb
 hdapt:
 	g++ rubixcube_HDAstar_pthread.cpp -o rubixcube_HDAstar_pthread -lpthread -ltbb
+hdaptm:
+	g++ rubixcube_HDAstar_pthread_measure.cpp -o rubixcube_HDAstar_pthread_measure -lpthread -ltbb
 para:
 	g++ rubixcube_parallel.cpp -o rubixcube_parallel -fopenmp
 
