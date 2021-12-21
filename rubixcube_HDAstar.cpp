@@ -800,7 +800,7 @@ int main(){
 
 
 
-    /*
+    
     {
         double startTime = CycleTimer::currentSeconds();
         int steps = BFS(vec_input);
@@ -809,8 +809,8 @@ int main(){
         printf("time: [%.3f] ms\n", (endTime - startTime) * 1000);
     }
     cout << endl;
-    */
     
+    /*
     {
         double startTime = CycleTimer::currentSeconds();
         //double s = clock();
@@ -835,7 +835,7 @@ int main(){
         //cout << "time: " << e - s << " ms" << endl;
     }
     cout << endl;
-    
+    */
 
     /*
     int opt;

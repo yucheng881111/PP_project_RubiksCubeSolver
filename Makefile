@@ -15,4 +15,4 @@ para:
 	g++ rubixcube_parallel.cpp -o rubixcube_parallel -fopenmp
 
 clean:
-	rm -f rubixcube_serial rubixcube_parallel rubixcube_HDAstar rubixcube_HDAstar_measure rubixcube_HDAstar_pthread rubixcube_serial_measure
+	rm -f rubixcube_serial rubixcube_parallel rubixcube_HDAstar rubixcube_HDAstar_measure rubixcube_HDAstar_pthread rubixcube_serial_measure rubixcube_HDAstar_pthread_measure

@@ -776,8 +776,8 @@ string Move(string state, int opt){
 int main(){
     
     int test = 10;
-    int input_steps = 8;
-    int method = 1; // 1:BFS 2:A_star 3:IDA
+    int input_steps = 9;
+    int method = 2; // 1:BFS 2:A_star 3:IDA
     double avg = 0.0;
     srand((unsigned)time(NULL));
     vector<double> all_times;
